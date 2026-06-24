@@ -64,20 +64,20 @@ bool load_rom(chip8_t *chip8, const char *path) {
     long size = ftell(f);
     rewind(f);
 
-    if (size > 4096 - 0x200) {
+    if (size > 4096 - RAM_START) {
         fprintf(stderr, "File too large: %ld bytes", size);
         fclose(f);
         return false;
     }
 
     // Read file
-    fread(&chip8->memory[0x200], 1, size, f);
+    fread(&chip8->memory[RAM_START], 1, size, f);
     fclose(f);
     return true
 }
 
 void emulate_cycle(chip8_t *chip8) {
-    //Fetch Operation
+    //Fetch Operations
     chip8->OP = chip8->memory[chip8->PC] << 8 | chip8->memory[chip8->PC + 1];
     chip8->PC = chip8->PC + 2;
 
