@@ -4,6 +4,9 @@
 #include <time.h>
 #include "display.h"
 
+#define RAM_START 0x200
+#define RAM_END 0xFFF
+
 uint8_t chip8_fontset[80] = {     // 16 * 5 bytes
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -42,7 +45,7 @@ void init_chip8(chip8_t *chip8) {
     memset(chip8, 0, sizeof(chip8_t));
 
     // Copy fontset
-    chip8->PC = 0x200;
+    chip8->PC = RAM_START;
     for (uint8_t i = 0; i < 80; i++) {
         chip8->memory[i] = chip8_fontset[i];
     }
@@ -50,7 +53,27 @@ void init_chip8(chip8_t *chip8) {
 
 // Load file into memory
 bool load_rom(chip8_t *chip8, const char *path) {
+    FILE *f = fopen(path, "rb");
+    if(!f) {
+        fprintf(stderr, "Failed to open ROM: %s\n", path);
+        return false;
+    }
 
+    // Check if ROM fits in memory
+    fseek(f, 0, RAM_END);
+    long size = ftell(f);
+    rewind(f);
+
+    if (size > 4096 - 0x200) {
+        fprintf(stderr, "File too large: %ld bytes", size);
+        fclose(f);
+        return false;
+    }
+
+    // Read file
+    fread(&chip8->memory[0x200], 1, size, f);
+    fclose(f);
+    return true
 }
 
 void emulate_cycle(chip8_t *chip8) {
