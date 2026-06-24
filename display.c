@@ -7,7 +7,6 @@
 #define CHIP8_WIDTH   64
 #define CHIP8_HEIGHT  32
 #define SCALE         10   // each CHIP-8 pixel = 10x10 screen pixels
-#define MARGIN        2    // 2 pixel large margin
 
 typedef struct {
     SDL_Window *window;
@@ -78,6 +77,7 @@ void render(sdl_t *sdl, const bool display[CHIP8_HEIGHT][CHIP8_WIDTH]) {
     SDL_RenderPresent(sdl->renderer);
 }
 
+/*
 int main(void) {
     sdl_t sdl = {0};
     if (!init_sdl(&sdl)) return 1;
@@ -107,3 +107,4 @@ int main(void) {
     cleanup(&sdl);
     return 0;
 }
+*/
