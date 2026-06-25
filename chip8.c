@@ -1,13 +1,13 @@
+#include "chip8.h"
+#include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
 #include "display.h"
 
-#define RAM_START 0x200
-#define RAM_END 0xFFF
-
-uint8_t chip8_fontset[80] = {     // 16 * 5 bytes
+const uint8_t chip8_fontset[CHIP8_FONTSET_SIZE] = {     // 16 * 5 bytes
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
     0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -25,20 +25,6 @@ uint8_t chip8_fontset[80] = {     // 16 * 5 bytes
     0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
-
-typedef struct {
-    uint8_t memory[4096];    // RAM, (0x000 to 0x1FF is reserved)
-    uint16_t stack[16];      // Call stack
-    uint8_t V[16];           // General registers, (V0 to VF)
-    uint16_t I;              // Memory address register
-    uint16_t PC;             // Program Counter
-    uint8_t SP;              // Stack Pointer
-    uint8_t DT;              // Dealy timer, counts down at 60Hz (Executes 60 opcodes in one second)
-    uint8_t ST;              // Sound timer, counts down at 60Hz, beeps while nonzero
-    uint8_t display[64][32]; // Screen buffer
-    bool keypad[16];         // Key states (pressed or not)
-    uint16_t OP;             // Current Opcode
-} chip8_t;
 
 void init_chip8(chip8_t *chip8) {
     // Initialize all bytes to 0s
@@ -230,7 +216,7 @@ void emulate_cycle(chip8_t *chip8) {
                     uint8_t screen_y = (y + row) % CHIP8_HEIGHT;
                     
                     // Retrieve and XOR the pixel
-                    uint8_t *px = &chip8->display[screen_y][screen_x];
+                    bool *px = &chip8->display[screen_y][screen_x];
                     if (*px) chip8->V[0xF] = 1;
                     *px ^= 1;
                 }
