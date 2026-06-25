@@ -10,6 +10,8 @@
 #define CHIP8_WIDTH   64
 #define CHIP8_HEIGHT  32
 #define SCALE         10   // each CHIP-8 pixel = 10x10 screen pixels
+#define PIXEL_ON 0xFFFFFF
+#define PIXEL_OFF 0x000000
 
 bool init_sdl(sdl_t *sdl)
 void cleanup(sdl_t *sdl)
