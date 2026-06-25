@@ -6,7 +6,7 @@
 
 #define RAM_START 0x200
 #define RAM_END 0xFFF
-#define CHIP8_FONTSET_SIZE 80
+#define CHIP8_FONTSET_SIZE 80 // 16 * 5 bytes
 
 typedef struct {
 	uint8_t memory[4096];
