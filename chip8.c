@@ -53,6 +53,7 @@ void init_chip8(chip8_t *chip8) {
 
 // Load file into memory
 bool load_rom(chip8_t *chip8, const char *path) {
+    // Read file as raw binary
     FILE *f = fopen(path, "rb");
     if(!f) {
         fprintf(stderr, "Failed to open ROM: %s\n", path);
@@ -60,9 +61,9 @@ bool load_rom(chip8_t *chip8, const char *path) {
     }
 
     // Check if ROM fits in memory
-    fseek(f, 0, RAM_END);
-    long size = ftell(f);
-    rewind(f);
+    fseek(f, 0, SEEK_END); // SEEK_END means to measure from the end of file
+    long size = ftell(f);  // Tells how many bytes from the start 
+    rewind(f);             // Resets the cursor
 
     if (size > 4096 - RAM_START) {
         fprintf(stderr, "File too large: %ld bytes", size);
@@ -70,12 +71,13 @@ bool load_rom(chip8_t *chip8, const char *path) {
         return false;
     }
 
-    // Read file
+    // Copy ROM to memory
     fread(&chip8->memory[RAM_START], 1, size, f);
     fclose(f);
-    return true
+    return true;
 }
 
+// Fetches, decodes and executes opcodes
 void emulate_cycle(chip8_t *chip8) {
     //Fetch Operations
     chip8->OP = chip8->memory[chip8->PC] << 8 | chip8->memory[chip8->PC + 1];
