@@ -128,11 +128,10 @@ void emulate_cycle(chip8_t *chip8) {
             chip8->V[x] += NN;
             break;
         
-        case 0x8000:         
-        switch(chip8->OP && 0xF00F) {
-                uint8_t x = (chip8->OP & 0x0F00) >> 8;
-                uint8_t y = (chip8->OP & 0x00F0) >> 4;
-
+        case 0x8000:     
+            uint8_t x = (chip8->OP & 0x0F00) >> 8;
+            uint8_t y = (chip8->OP & 0x00F0) >> 4;    
+            switch(chip8->OP && 0xF00F) {
                 case 0x8000: // Set Vx = Vy
                     chip8->V[x] = chip8->V[y];
                     break;
@@ -173,8 +172,8 @@ void emulate_cycle(chip8_t *chip8) {
                     chip8->V[0xF] = (chip8->V[x] & 0xF0) >> 1;
                     chip8->V[x] <<= 1;
                     break;
-            }
-        break;
+                }
+            break;
 
         case 0x9000:         // Skip next instruction if Vx != Vy
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
@@ -223,19 +222,21 @@ void emulate_cycle(chip8_t *chip8) {
             }
 
         case 0xE000:
+            uint8_t x = (chip8->OP & 0x0F00) >> 8;
             switch(chip8->OP & 0xF0FF){
-                uint8_t x = (chip8->OP & 0x0F00) >> 8;
                 case 0xE09E: // Skip next OP if Vx is pressed on keypad
-                    if(chip8->keypad[x] == chip8->V[x])
+                    if(chip8->keypad[chip8->V[x]] == 1)
                         chip8->PC += 2;
+                    break;
                 case 0xE0A1: // Skip next OP if Vx is not pressed on keypad
-                    if(chip8->keypad[x] != chip8->V[x])
+                    if(chip8->keypad[chip8->V[x]] == 0)
                         chip8->PC += 2;
+                    break;
             }
         
         case 0xF000:
+            uint8_t x = (chip8->OP & 0x0F00) >> 8;
             switch(chip8->OP & 0xF0FF){
-                uint8_t x = (chip8->OP & 0x0F00) >> 8;
                 case 0xF007: // Set Vx = DT value
                     chip8->V[x] = chip8->DT;
                     break;
