@@ -2,12 +2,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <SDL2/SDL.h>
-
-typedef struct {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    SDL_Texture *texture;
-} sdl_t;
+#include "display.h"
+#include "chip8.h"
 
 bool init_sdl(sdl_t *sdl) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -38,7 +34,7 @@ bool init_sdl(sdl_t *sdl) {
 
     // Initialise SDL Texture
     sdl->texture = SDL_CreateTexture (
-    renderer,
+    sdl->renderer,
     SDL_PIXELFORMAT_RGBA8888,
     SDL_TEXTUREACCESS_STREAMING, 
     CHIP8_WIDTH, CHIP8_HEIGHT
@@ -67,12 +63,12 @@ void render(sdl_t *sdl, chip8_t *chip8) {
     // Read display values to color values in screen_buffer
     uint32_t screen_buffer[CHIP8_HEIGHT * CHIP8_WIDTH];
     for(int i; i < CHIP8_HEIGHT * CHIP8_WIDTH; i++) {
-        screen_buffer[i] = chip8->display[i] ? PIXEL_ON : PIXEL_OFF
+        screen_buffer[i] = chip8->display[i] ? PIXEL_ON : PIXEL_OFF;
     }
 
     // Convert screen_buffer to texture
     SDL_UpdateTexture(sdl->texture, NULL, screen_buffer, CHIP8_WIDTH * sizeof(uint32_t));
     SDL_RenderClear(sdl->renderer);
-    SDL_RenderCopy(renderer, texture, NULL, NULL); 
-    SDL_RenderPresent(renderer);
+    SDL_RenderCopy(sdl->renderer, sdl->texture, NULL, NULL); 
+    SDL_RenderPresent(sdl->renderer);
 }

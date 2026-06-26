@@ -1,4 +1,3 @@
-#include "chip8.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -6,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "display.h"
+#include "chip8.h"
 
 static const uint8_t chip8_fontset[CHIP8_FONTSET_SIZE] = {  
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0

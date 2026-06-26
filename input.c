@@ -9,6 +9,7 @@ CHIP-8 Keypad   SDL Keyboard
    A 0 B F        Z X C V
 */
 
+// Updates the SDL keyboard only
 void process_input(chip8_t *chip8, bool *running, SDL_Event *event) {
     switch (event->type) {
         case SDL_QUIT:

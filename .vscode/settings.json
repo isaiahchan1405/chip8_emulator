@@ -1,0 +1,13 @@
+{
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.tabCompletion": "on",
+  "editor.snippetSuggestions": "top",
+  "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.autocomplete": "Default",
+  "C_Cpp.errorSquiggles": "Enabled"
+}
