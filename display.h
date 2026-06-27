@@ -20,9 +20,9 @@ typedef struct {
     SDL_Texture *texture;
 } sdl_t;
 
-bool init_sdl(sdl_t *sdl)
-void cleanup(sdl_t *sdl)
-void clear_screen(sdl_t *sdl)
-void render(sdl_t *sdl, chip8_t *chip8) 
+bool init_sdl(sdl_t *sdl);
+void cleanup(sdl_t *sdl);
+void clear_screen(sdl_t *sdl);
+void render(sdl_t *sdl, chip8_t *chip8); 
 
 #endif

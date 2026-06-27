@@ -13,7 +13,7 @@ int main(void) {
     chip8_t chip8;
     init_chip8(&chip8);
 
-    bool load_successful = load_rom(&chip8, "path");
+    bool load_successful = load_rom(&chip8, "2-ibm-logo.ch8");
     if (!load_successful) return 0;
 
     bool running = true;
@@ -28,16 +28,8 @@ int main(void) {
 
         render(&sdl, &chip8);
 
-        SDL_delay(1000 / FPS);
+        SDL_Delay(1000 / FPS);
     }
 
     return 0;
 }
-/*
-initialise sdl and chip8
-while running
-    deque OS input
-    Read memory, process Opcode
-    render
-    pause
-*/

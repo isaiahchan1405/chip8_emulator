@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <time.h>
-#include "display.h"
 #include "chip8.h"
 
 static const uint8_t chip8_fontset[CHIP8_FONTSET_SIZE] = {  
@@ -70,8 +69,8 @@ void emulate_cycle(chip8_t *chip8) {
     chip8->PC = chip8->PC + 2;
 
     //Decode and Execute Opcode Operation
-    switch (chip8->OP && 0xF000) {
-        case 0x0000:
+    switch (chip8->OP & 0xF000) {
+        case 0x0000: 
             switch (chip8->OP & 0x00FF){
                 case 0x00E0:  // Clear Display
                     memset(chip8->display, 0, sizeof(chip8->display));
@@ -84,6 +83,7 @@ void emulate_cycle(chip8_t *chip8) {
                     chip8->PC += 2;
                     break;
             }
+            break;
 
         case 0x1000:         // Jump to location nnn (0x1nnn)
             chip8->PC = chip8->OP && 0x0FFF;
@@ -95,43 +95,48 @@ void emulate_cycle(chip8_t *chip8) {
             chip8->PC = chip8->OP && 0x0FFF;
             break;
 
-        case 0x3000:         // Skip next instruction if Vx == NN
+        case 0x3000: {       // Skip next instruction if Vx == NN
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             uint8_t NN = (chip8->OP & 0x00FF);
             if(chip8->V[x] == NN)
                 chip8->PC += 2;
             break;
-        
-        case 0x4000:         // Skip next instruction if Vx != NN
+        }
+
+        case 0x4000: {       // Skip next instruction if Vx != NN
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             uint8_t NN = (chip8->OP & 0x00FF);
             if(chip8->V[x] != NN)
                 chip8->PC += 2;
             break;
+        }
 
-        case 0x5000:         // Skip next instruction if Vx == Vy
+        case 0x5000: {       // Skip next instruction if Vx == Vy
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             uint8_t y = (chip8->OP & 0x00F0) >> 4;
             if(chip8->V[x] == chip8->V[y])
                 chip8->PC += 2;
             break;
-        
-        case 0x6000:         // Put NN into Vx
+        }
+
+        case 0x6000: {       // Put NN into Vx
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             uint8_t NN = (chip8->OP & 0x00FF);
             chip8->V[x] = NN;
             break;
+        }
 
-        case 0x7000:         // Set Vx = Vx + NN
+        case 0x7000: {       // Set Vx = Vx + NN
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             uint8_t NN = (chip8->OP & 0x00FF);
             chip8->V[x] += NN;
             break;
+        }
         
-        case 0x8000:     
+        case 0x8000: {     
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             uint8_t y = (chip8->OP & 0x00F0) >> 4;    
-            switch(chip8->OP && 0xF00F) {
+            switch(chip8->OP & 0xF00F) {
                 case 0x8000: // Set Vx = Vy
                     chip8->V[x] = chip8->V[y];
                     break;
@@ -145,7 +150,7 @@ void emulate_cycle(chip8_t *chip8) {
                     chip8->V[x] = chip8->V[x] ^ chip8->V[y];
                     break;
                 case 0x8004: // Set Vx = Vx + Vy, set VF = carry
-                    if (chip8->V[x] & chip8->V[y] < chip8->V[x]) 
+                    if ((chip8->V[x] & chip8->V[y]) < chip8->V[x]) 
                         chip8->V[0xF] = 1;
                     else
                         chip8->V[0xF] = 0;
@@ -168,20 +173,23 @@ void emulate_cycle(chip8_t *chip8) {
                     else
                         chip8->V[0xF] = 0;
                     chip8->V[x] = chip8->V[y] - chip8->V[x];
+                    break;
                 case 0x800E: // Set Vx = Vx SHL(Shift Left) 1
                     chip8->V[0xF] = (chip8->V[x] & 0xF0) >> 1;
                     chip8->V[x] <<= 1;
                     break;
                 }
             break;
+        }
 
-        case 0x9000:         // Skip next instruction if Vx != Vy
+        case 0x9000: {       // Skip next instruction if Vx != Vy
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             uint8_t y = (chip8->OP & 0x00F0) >> 4;
             if (chip8->V[x] != chip8->V[y])
                 chip8->PC += 2;
             break;
-        
+        }
+
         case 0xA000:         // Set I = nnn
             chip8->I = (chip8->OP & 0x0FFF);
             break;
@@ -195,7 +203,7 @@ void emulate_cycle(chip8_t *chip8) {
             chip8->V[(chip8->OP & 0xFF00) >> 8] = (rand() % (255 + 1)) & (chip8->OP & 0x00FF);
             break;
         
-        case 0xD000:         // Replaces display with sprite; Detects collisions; Wraps sprites if out of bound
+        case 0xD000: {       // Replaces display with sprite; Detects collisions; Wraps sprites if out of bound
             uint8_t x = chip8->V[(chip8->OP & 0x0F00) >> 8];
             uint8_t y = chip8->V[(chip8->OP & 0x00F0) >> 4];
             uint8_t h = chip8->OP & 0x000F;
@@ -220,8 +228,10 @@ void emulate_cycle(chip8_t *chip8) {
                     *px ^= 1;
                 }
             }
+            break;
+        }
 
-        case 0xE000:
+        case 0xE000: {
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             switch(chip8->OP & 0xF0FF){
                 case 0xE09E: // Skip next OP if Vx is pressed on keypad
@@ -233,8 +243,10 @@ void emulate_cycle(chip8_t *chip8) {
                         chip8->PC += 2;
                     break;
             }
+            break;
+        }
         
-        case 0xF000:
+        case 0xF000: {
             uint8_t x = (chip8->OP & 0x0F00) >> 8;
             switch(chip8->OP & 0xF0FF){
                 case 0xF007: // Set Vx = DT value
@@ -265,18 +277,18 @@ void emulate_cycle(chip8_t *chip8) {
                 case 0xF033: // Store BCD(Binary-Coded Decimal) of Vx in memmory[I, I+1, I+2]
                    // Extract hundred's digit
                     uint8_t huns = chip8->V[x] / 100;
-                    chip8->memory[I] = huns;
+                    chip8->memory[chip8->I] = huns;
 
                    // Extract ten's digit
                     uint8_t tens = chip8->V[x] / 10;
-                    chip8->memory[I + 1] = tens;
+                    chip8->memory[chip8->I + 1] = tens;
 
                    // Extract one's digit
                     uint8_t ones = chip8->V[x] % 10; 
-                    chip8->memory[I + 2] = ones;
-                    break
+                    chip8->memory[chip8->I + 2] = ones;
+                    break;
                 case 0xF055: // Store registers V[0 to x] to memory[I to I + x] (x inclusive)
-                    for(int i = 0; 0 <= x; i++) {
+                    for(int i = 0; i <= x; i++) {
                         chip8->memory[chip8->I + i] = chip8->V[i];
                     }
                     break;
@@ -285,5 +297,7 @@ void emulate_cycle(chip8_t *chip8) {
                         chip8->V[i] = chip8->memory[chip8->I + i];
                     }
             }
+            break;
+        }
     }
 }

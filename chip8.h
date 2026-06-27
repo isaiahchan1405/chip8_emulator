@@ -7,6 +7,9 @@
 #define RAM_START 0x200
 #define RAM_END 0xFFF
 #define CHIP8_FONTSET_SIZE 80 // 16 * 5 bytes
+#define CHIP8_HEIGHT 32
+#define CHIP8_WIDTH 64
+
 
 typedef struct {
 	uint8_t memory[4096];
@@ -22,7 +25,7 @@ typedef struct {
 	uint16_t OP;
 } chip8_t;
 
-extern const uint8_t chip8_fontset[CHIP8_FONTSET_SIZE];
+static const uint8_t chip8_fontset[CHIP8_FONTSET_SIZE];
 
 void init_chip8(chip8_t *chip8);
 bool load_rom(chip8_t *chip8, const char *path);
